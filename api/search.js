@@ -53,7 +53,7 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-
+console.log('検索APIの結果:', data);
     const results = (data.results || []).map(item => ({
       title: item.title || 'タイトルなし',
       url: item.url || '',
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
 
   } catch (error) {
     return res.status(500).json({
-      error: '検索に失敗しました。時間をおいて再度試してください。'
-    });
+  error: error.message || '検索に失敗しました。'
+});
   }
 }
