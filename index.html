@@ -769,24 +769,45 @@ data.pins.push({
 
 renderMapPins();
 
+
 const venueMaps = {
   east123: {
     name: '東1・2・3',
-    file: './east123.pdf'
+    file: 'C108Map_e123_B4.pdf'
   },
   east7: {
     name: '東7',
-    file: './east7.pdf'
+    file: 'C108Map_e7_B4.pdf'
   },
   west12: {
     name: '西1・2',
-    file: './west12.pdf'
+    file: 'C108Map_w12_B4.pdf'
   },
   south12: {
     name: '南1・2',
-    file: './south12.pdf'
+    file: 'C108Map_s12_B4.pdf'
   }
 };
+
+function openVenueMap(id){
+  const map = venueMaps[id];
+  if(!map)return;
+
+  document.getElementById('venueMapViewer').classList.remove('hidden');
+  document.getElementById('venueMapContent').innerHTML = `
+    <h3>${map.name}</h3>
+    <iframe src="./${map.file}"></iframe>
+  `;
+
+  document.querySelector('.mapGrid').classList.add('hidden');
+}
+
+function closeVenueMap(){
+  document.getElementById('venueMapViewer').classList.add('hidden');
+  document.getElementById('venueMapContent').innerHTML = '';
+  document.querySelector('.mapGrid').classList.remove('hidden');
+}
+
 
 function openVenueMap(id){
   const map = venueMaps[id];
