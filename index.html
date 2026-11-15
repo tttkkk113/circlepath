@@ -757,12 +757,7 @@ data.pins.push({
   y:y
 });
 
-  data.pins = data.pins || [];
-  data.pins.push({
-    circleId: circle.id,
-    x: (e.clientX - rect.left) / rect.width * 100,
-    y: (e.clientY - rect.top) / rect.height * 100
-  });
+  
   save();
   renderMapPins();
 });
@@ -800,11 +795,13 @@ async function openVenueMap(id) {
 
   content.innerHTML = `
     <h3>${map.name}</h3>
-    <div id="pdfCanvasWrap" style="width:100%;overflow:auto;background:#222;">
-      <canvas id="pdfCanvas"></canvas>
+      <div id="pdfCanvasWrap" style="width:100%;overflow:auto;background:#222;position:relative;">
+      <div id="pdfMapStage" style="position:relative;width:max-content;">
+        <canvas id="pdfCanvas"></canvas>
+        <div id="pdfMapPins" style="position:absolute;inset:0;pointer-events:none;"></div>
+      </div>
     </div>
     <p id="pdfStatus">マップを読み込み中...</p>
-  `;
 
   try {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -836,10 +833,79 @@ async function drawMap() {
 }
 
 await drawMap();
+renderVenuePins();
 const wrap = document.getElementById('pdfCanvasWrap');
+const pdfMapStage = document.getElementById('pdfMapStage');
+const pdfMapPins = document.getElementById('pdfMapPins');
+function renderVenuePins() {
+pdfMapStage.addEventListener('click', e => {
+  if (e.target.closest('button')) return;
 
+  if (!data.circles.length) {
+    alert('先にサークルを登録してね！');
+    return;
+  }
+
+  const circleName = prompt('ピンを付けるサークル名を入力してね');
+  if (!circleName) return;
+
+  const circle = data.circles.find(c => c.name === circleName);
+
+  if (!circle) {
+    alert('登録済みのサークル名を入力してね。');
+    return;
+  }
+
+  const rect = pdfMapStage.getBoundingClientRect();
+
+  const x = Math.max(0, Math.min(100,
+    (e.clientX - rect.left) / rect.width * 100
+  ));
+
+  const y = Math.max(0, Math.min(100,
+    (e.clientY - rect.top) / rect.height * 100
+  ));
+
+  data.venuePins = data.venuePins || {};
+  data.venuePins[id] = data.venuePins[id] || [];
+
+  data.venuePins[id].push({
+    circleId: circle.id,
+    x: x,
+    y: y
+  });
+
+  save();
+  renderVenuePins();
+});
+  pdfMapPins.innerHTML = '';
+
+  const pins = (data.venuePins || {})[id] || [];
+
+  pins.forEach(pin => {
+    const el = document.createElement('button');
+    el.textContent = '📍';
+    el.style.position = 'absolute';
+    el.style.left = pin.x + '%';
+    el.style.top = pin.y + '%';
+    el.style.transform = 'translate(-50%, -50%)';
+    el.style.fontSize = '24px';
+    el.style.border = 'none';
+    el.style.background = 'transparent';
+    el.style.pointerEvents = 'auto';
+
+    el.onclick = () => {
+      const circle = data.circles.find(c => c.id === pin.circleId);
+      if (circle) {
+        alert(circle.name + '\n' + (circle.space || '') + '\n' + (circle.work || ''));
+      }
+    };
+
+    pdfMapPins.appendChild(el);
+  });
+}
 wrap.style.touchAction = 'none';
-canvas.style.transformOrigin = '0 0';
+pdfMapStage.style.transformOrigin = '0 0';
 
 let startDistance = 0;
 let startZoom = 1;
@@ -904,9 +970,8 @@ wrap.addEventListener('touchmove', e => {
     panY = startPanY + e.touches[0].clientY - startY;
   }
 
-  canvas.style.transform =
-    `translate(${panX}px, ${panY}px) scale(${zoom})`;
-
+  pdfMapStage.style.transform =
+  `translate(${panX}px, ${panY}px) scale(${zoom})`;
 }, { passive: false });
 
 
