@@ -39,8 +39,10 @@ const responses = await Promise.all(
       body: JSON.stringify({
         query: searchQuery,
         search_depth: 'advanced',
-        max_results: 30,
-        include_answer: false,
+        max_results: 20,
+start_date: '2026-11-06',
+filter_by_published_date: true,
+include_answer: false,
         include_domains: [
           'webcatalog.circle.ms',
           'x.com',
