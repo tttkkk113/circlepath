@@ -32,7 +32,7 @@ export default async function handler(req, res) {
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-  query: `${query} C109 サークル参加 お品書き 新刊 頒布物 スペース 配置`,
+  query: `"${query}" C109 参加サークル お品書き 新刊 頒布物 サークル名 スペース番号 -申込書 -チケット -通販 -入場案内`,
   search_depth: 'advanced',
   max_results: 10,
   include_answer: false,
@@ -51,12 +51,25 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 console.log('検索APIの結果:', data);
-    const results = (data.results || []).map(item => ({
-      title: item.title || 'タイトルなし',
-      url: item.url || '',
-      content: item.content || '',
-      status: 'Webで発見・未確認'
-    }));
+    const results = (data.results || [])
+  .filter(item => {
+    const text = `${item.title || ''} ${item.content || ''}`;
+    const excluded = [
+      'コミックマーケット準備会',
+      '@comiketofficial',
+      '参加申込書',
+      '入場チケット',
+      '入場案内'
+    ];
+
+    return !excluded.some(word => text.includes(word));
+  })
+  .map(item => ({
+    title: item.title || 'タイトルなし',
+    url: item.url || '',
+    content: item.content || '',
+    status: 'Webで発見・未確認'
+  }));
 
     return res.status(200).json({ results });
 
