@@ -833,50 +833,8 @@ async function drawMap() {
 }
 
 await drawMap();
-renderVenuePins();
+
 const wrap = document.getElementById('pdfCanvasWrap');
-const pdfMapStage = document.getElementById('pdfMapStage');
-const pdfMapPins = document.getElementById('pdfMapPins');
-function renderVenuePins() {
-pdfMapStage.addEventListener('click', e => {
-  if (e.target.closest('button')) return;
-
-  if (!data.circles.length) {
-    alert('先にサークルを登録してね！');
-    return;
-  }
-
-  const circleName = prompt('ピンを付けるサークル名を入力してね');
-  if (!circleName) return;
-
-  const circle = data.circles.find(c => c.name === circleName);
-
-  if (!circle) {
-    alert('登録済みのサークル名を入力してね。');
-    return;
-  }
-
-  const rect = pdfMapStage.getBoundingClientRect();
-
-  const x = Math.max(0, Math.min(100,
-    (e.clientX - rect.left) / rect.width * 100
-  ));
-
-  const y = Math.max(0, Math.min(100,
-    (e.clientY - rect.top) / rect.height * 100
-  ));
-
-  data.venuePins = data.venuePins || {};
-  data.venuePins[id] = data.venuePins[id] || [];
-
-  data.venuePins[id].push({
-    circleId: circle.id,
-    x: x,
-    y: y
-  });
-
-  save();
-  const wrap = document.getElementById('pdfCanvasWrap');
 const pdfMapStage = document.getElementById('pdfMapStage');
 const pdfMapPins = document.getElementById('pdfMapPins');
 
@@ -887,6 +845,7 @@ function renderVenuePins() {
 
   pins.forEach(pin => {
     const el = document.createElement('button');
+
     el.textContent = '📍';
     el.style.position = 'absolute';
     el.style.left = pin.x + '%';
@@ -899,6 +858,7 @@ function renderVenuePins() {
 
     el.onclick = () => {
       const circle = data.circles.find(c => c.id === pin.circleId);
+
       if (circle) {
         alert(circle.name + '\n' + (circle.space || '') + '\n' + (circle.work || ''));
       }
