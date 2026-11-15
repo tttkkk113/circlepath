@@ -24,8 +24,8 @@ export default async function handler(req, res) {
 
   try {
     const searchQueries = [
-  `"${query}" C109 参加サークル サークル名 配置 スペース番号 お品書き 新刊`,
-  `"${query}" C109 サークル参加 頒布物 グッズ 新刊 X`
+  `"${query}" C109 2026年12月 コミックマーケット109 サークル配置 お品書き 新刊`,
+  `"${query}" C109 2026冬コミ サークル参加 スペース番号 頒布物 新刊`,
 ];
 
 const responses = await Promise.all(
