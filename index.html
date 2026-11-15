@@ -824,6 +824,7 @@ async function drawMap() {
   canvas.height = viewport.height;
   canvas.style.width = viewport.width + 'px';
   canvas.style.height = viewport.height + 'px';
+  canvas.style.display = 'block';
   canvas.style.transform = `translate(${panX}px, ${panY}px)`;
 
   await page.render({
