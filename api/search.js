@@ -24,8 +24,11 @@ export default async function handler(req, res) {
 
   try {
     const searchQueries = [
-  `"${query}" C109 2026年12月 コミックマーケット109 サークル配置 お品書き 新刊`,
-  `"${query}" C109 2026冬コミ サークル参加 スペース番号 頒布物 新刊`,
+  `"${query}" C109 2026年12月 コミックマーケット109 サークル配置`,
+  `"${query}" C109 2026冬コミ サークル参加 スペース番号`,
+  `"${query}" コミケ109 お品書き 新刊 頒布物`,
+  `"${query}" 冬コミ サークル C109 配置`,
+  `"${query}" コミックマーケット109 サークル情報`
 ];
 
 const responses = await Promise.all(
@@ -39,7 +42,7 @@ const responses = await Promise.all(
       body: JSON.stringify({
         query: searchQuery,
         search_depth: 'advanced',
-        max_results: 20,
+        max_results: 30,
 start_date: '2026-11-06',
 filter_by_published_date: true,
 include_answer: false,
