@@ -54,13 +54,21 @@ console.log('検索APIの結果:', data);
     const results = (data.results || [])
   .filter(item => {
     const text = `${item.title || ''} ${item.content || ''}`;
-    const excluded = [
-      'コミックマーケット準備会',
-      '@comiketofficial',
-      '参加申込書',
-      '入場チケット',
-      '入場案内'
-    ];
+   const excluded = [
+  'コミックマーケット準備会',
+  '@comiketofficial',
+  'Comic Market Committee',
+  '@comiket_intl',
+  'チケット',
+  'tickets',
+  'wristband',
+  '入場案内',
+  '参加申込書',
+  '申込関連',
+  '開催日程',
+  'December 29-31',
+  '入場時間'
+];
 
     return !excluded.some(word => text.includes(word));
   })
