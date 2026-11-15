@@ -74,13 +74,14 @@ const unique = [
 console.log('検索APIの結果:', unique);
 
 const results = unique
-  .filter(item => {
+  .map(item => {
     const text = `${item.title || ''} ${item.content || ''}`;
+    const lower = text.toLowerCase();
 
     const excluded = [
       'コミックマーケット準備会',
       '@comiketofficial',
-      'Comic Market Committee',
+      'comic market committee',
       '@comiket_intl',
       'チケット',
       'tickets',
@@ -92,21 +93,49 @@ const results = unique
       'December 29-31',
       '入場時間',
       'リポスト',
-      'Repost',
-      'RT @',
+      'repost',
+      'rt @',
       '引用ポスト',
       '引用リポスト',
-      'Retweeted'
+      'retweeted'
     ];
 
-    return !excluded.some(word => text.includes(word));
+    if (excluded.some(word => lower.includes(word.toLowerCase()))) {
+      return null;
+    }
+
+    const keywords = [
+      'c109',
+      '冬コミ',
+      'コミケ',
+      'サークル参加',
+      'スペース',
+      '配置',
+      'お品書き',
+      '新刊',
+      '頒布',
+      '同人誌',
+      'グッズ'
+    ];
+
+    const score = keywords.reduce(
+      (total, word) => total + (lower.includes(word.toLowerCase()) ? 1 : 0),
+      0
+    );
+
+    if (score < 2) return null;
+
+    return {
+      title: item.title || 'タイトルなし',
+      url: item.url || '',
+      content: item.content || '',
+      status: 'Webで発見・未確認',
+      score
+    };
   })
-  .map(item => ({
-    title: item.title || 'タイトルなし',
-    url: item.url || '',
-    content: item.content || '',
-    status: 'Webで発見・未確認'
-  }));
+  .filter(Boolean)
+  .sort((a, b) => b.score - a.score)
+  .map(({ score, ...item }) => item);
 
 return res.status(200).json({ results });
   } catch (error) {
