@@ -794,7 +794,8 @@ function openVenueMap(id){
   alert('マップを開くボタンは反応してるよ！');
 
   const map = venueMaps[id];
-  if(!map)return;
+alert(map ? map.file : 'マップデータが見つからない！');
+if(!map)return;
 
   document.getElementById('venueMapViewer').classList.remove('hidden');
   document.getElementById('venueMapContent').innerHTML = `
