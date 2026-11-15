@@ -142,6 +142,7 @@ const results = unique
   author: xMatch ? xMatch[1].toLowerCase() : null,
   publishedDate: item.published_date || null
 };
+  })
   .filter(Boolean)
   .sort((a, b) => b.score - a.score);
 
