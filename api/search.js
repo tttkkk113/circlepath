@@ -38,7 +38,7 @@ query: `${query} C109 サークル参加 お品書き 新刊 頒布物 スペー
   include_answer: false,
   include_domains: [
     'webcatalog.circle.ms',
-    'x.com'
+    
   ]
 })
       }
