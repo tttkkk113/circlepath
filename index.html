@@ -1,0 +1,620 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17132b">
+<title>CirclePath</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#100e1c;
+  color:#f5f2ff;
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
+  padding-bottom:95px;
+}
+header{
+  padding:22px 20px 16px;
+  background:linear-gradient(135deg,#30215d,#17132b);
+  border-bottom:1px solid #403269;
+}
+.logo{font-size:25px;font-weight:900;letter-spacing:1px}
+.logo span{color:#b69aff}
+.subtitle{font-size:12px;color:#c6b9e8;margin-top:4px}
+main{padding:16px;max-width:700px;margin:auto}
+section{display:block}
+.hidden{display:none!important}
+h2{font-size:21px;margin:8px 0 16px}
+h3{font-size:15px;margin:0 0 12px}
+.card{
+  background:#211d35;
+  border:1px solid #393052;
+  border-radius:17px;
+  padding:16px;
+  margin-bottom:13px;
+}
+.hero{
+  background:linear-gradient(135deg,#49318a,#25204a);
+  border:1px solid #7659b6;
+  border-radius:20px;
+  padding:22px;
+  margin-bottom:16px;
+}
+.hero small{color:#d4c7ff}
+.hero h2{font-size:25px;margin:8px 0}
+.hero p{font-size:13px;color:#ded5fa}
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.tile{
+  background:#211d35;
+  border:1px solid #393052;
+  border-radius:16px;
+  padding:18px 14px;
+  text-align:left;
+  color:white;
+  min-height:105px;
+}
+.tile b{display:block;font-size:16px;margin-bottom:8px}
+.tile small{color:#aaa}
+input,select,textarea{
+  width:100%;
+  background:#151225;
+  border:1px solid #51466d;
+  color:white;
+  padding:13px;
+  border-radius:11px;
+  margin:5px 0 12px;
+  font-size:15px;
+}
+label{font-size:12px;color:#c9bee5}
+button{
+  border:0;
+  background:#7956c8;
+  color:white;
+  padding:11px 15px;
+  border-radius:10px;
+  font-weight:700;
+  font-size:13px;
+  cursor:pointer;
+}
+button:active{opacity:.7}
+button.secondary{background:#39304f}
+button.danger{background:#8c3e60}
+button.full{width:100%;margin-top:5px}
+.row{display:flex;gap:8px;align-items:center}
+.row>*{flex:1;min-width:0}
+.muted{color:#aaa2bc;font-size:12px}
+.item{
+  padding:12px 0;
+  border-bottom:1px solid #39334a;
+}
+.item:last-child{border-bottom:0}
+.item b{font-size:14px}
+.item p{margin:5px 0}
+.badge{
+  display:inline-block;
+  background:#493477;
+  color:#e4d7ff;
+  padding:4px 8px;
+  border-radius:7px;
+  font-size:11px;
+}
+.stat{
+  font-size:22px;
+  font-weight:800;
+  color:#c7aaff;
+}
+nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#191529;
+  border-top:1px solid #393052;
+  display:flex;
+  justify-content:space-around;
+  padding:9px 3px calc(9px + env(safe-area-inset-bottom));
+  z-index:10;
+}
+nav button{
+  background:transparent;
+  color:#a79bbd;
+  padding:7px 5px;
+  font-size:11px;
+  flex:1;
+}
+nav button span{display:block;font-size:20px;margin-bottom:3px}
+nav button.active{color:#c5a8ff}
+#mapPreview{
+  display:block;
+  max-width:100%;
+  max-height:65vh;
+  margin:12px auto;
+  border-radius:12px;
+  object-fit:contain;
+}
+.empty{
+  color:#aaa2bc;
+  text-align:center;
+  padding:22px 8px;
+  font-size:13px;
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="logo">Circle<span>Path</span></div>
+  <div class="subtitle">EVENT & CIRCLE MANAGEMENT</div>
+</header>
+
+<main>
+
+<!-- ホーム -->
+<section id="home">
+  <div class="hero">
+    <small>YOUR EVENT COMPANION</small>
+    <h2>イベントを、もっと楽しく。</h2>
+    <p>サークルも、会場マップも、買い物リストも。CirclePathでまとめて管理。</p>
+    <button onclick="show('circles')">サークルを登録する →</button>
+  </div>
+
+  <div class="card">
+    <h3>イベント情報</h3>
+    <label>イベント名</label>
+    <input id="eventName" placeholder="例：コミックマーケット">
+    <button class="full" onclick="saveEvent()">イベント名を保存</button>
+  </div>
+
+  <div class="grid">
+    <button class="tile" onclick="show('map')">
+      <b>▦ 会場マップ</b>
+      <small>マップを確認する</small>
+    </button>
+    <button class="tile" onclick="show('circles')">
+      <b>⌕ サークル</b>
+      <small id="circleCount">0件登録</small>
+    </button>
+    <button class="tile" onclick="show('shopping')">
+      <b>▣ 買い物リスト</b>
+      <small>購入予定を管理</small>
+    </button>
+    <button class="tile" onclick="show('route')">
+      <b>➜ 巡回リスト</b>
+      <small>回るサークルを確認</small>
+    </button>
+  </div>
+
+  <div class="card" style="margin-top:15px">
+    <h3>買い物状況</h3>
+    <div class="stat" id="homeTotal">¥0</div>
+    <p class="muted" id="homeProgress">0件購入済み</p>
+  </div>
+</section>
+
+<!-- サークル -->
+<section id="circles" class="hidden">
+  <h2>サークル管理</h2>
+
+  <div class="card">
+    <h3>＋ サークルを登録</h3>
+    <label>サークル名 *</label>
+    <input id="cname" placeholder="サークル名">
+
+    <label>作品名</label>
+    <input id="cwork" placeholder="例：崩壊スターレイル">
+
+    <label>キャラクター・内容</label>
+    <input id="cgoods" placeholder="例：黄泉、アベンチュリン">
+
+    <label>参加日</label>
+    <select id="cday">
+      <option value="">未設定</option>
+      <option>1日目</option>
+      <option>2日目</option>
+      <option>3日目</option>
+      <option>4日目</option>
+    </select>
+
+    <label>配置場所</label>
+    <input id="cspace" placeholder="例：東A-12a">
+
+    <button class="full" onclick="addCircle()">サークルを登録</button>
+  </div>
+
+  <input id="circleSearch" placeholder="サークル名・作品名・配置で検索" oninput="renderCircles()">
+  <div id="circleList"></div>
+</section>
+
+<!-- 買い物 -->
+<section id="shopping" class="hidden">
+  <h2>買い物リスト</h2>
+
+  <div class="card">
+    <h3>＋ 商品を追加</h3>
+    <label>商品名 *</label>
+    <input id="iname" placeholder="商品名">
+
+    <label>サークル名</label>
+    <input id="icircle" placeholder="サークル名">
+
+    <div class="row">
+      <div>
+        <label>価格（円）</label>
+        <input id="iprice" type="number" min="0" placeholder="1000">
+      </div>
+      <div>
+        <label>数量</label>
+        <input id="iqty" type="number" min="1" value="1">
+      </div>
+    </div>
+    <button class="full" onclick="addItem()">商品を追加</button>
+  </div>
+
+  <div class="card">
+    <h3>予算管理</h3>
+    <label>予算（円）</label>
+    <input id="budget" type="number" min="0" placeholder="30000">
+    <button onclick="saveBudget()">予算を保存</button>
+    <p class="muted" id="budgetText"></p>
+    <div class="stat" id="total">¥0</div>
+    <p class="muted" id="progress">0件購入済み</p>
+  </div>
+
+  <div id="itemList"></div>
+</section>
+
+<!-- マップ -->
+<section id="map" class="hidden">
+  <h2>会場マップ</h2>
+
+  <div class="card">
+    <h3>会場マップをアップロード</h3>
+    <p class="muted">iPhone内の画像を選択してマップに表示できるよ。</p>
+    <input id="mapFile" type="file" accept="image/*">
+    <button class="danger" onclick="deleteMap()">マップを削除</button>
+  </div>
+
+  <div class="card">
+    <div id="mapMessage" class="empty">マップ画像はまだ登録されていません。</div>
+    <img id="mapPreview" class="hidden" alt="会場マップ">
+  </div>
+</section>
+
+<!-- 巡回 -->
+<section id="route" class="hidden">
+  <h2>巡回リスト</h2>
+  <div class="card">
+    <h3>登録したサークル一覧</h3>
+    <p class="muted">登録したサークルを確認できるよ。</p>
+    <div id="routeList"></div>
+  </div>
+</section>
+
+<!-- 設定 -->
+<section id="settings" class="hidden">
+  <h2>設定・バックアップ</h2>
+
+  <div class="card">
+    <h3>データのバックアップ</h3>
+    <p class="muted">登録したサークルや買い物リストをファイルに保存するよ。</p>
+    <button class="full" onclick="backup()">バックアップを保存</button>
+  </div>
+
+  <div class="card">
+    <h3>バックアップから復元</h3>
+    <p class="muted">以前のCirclePathで保存したJSONファイルも読み込めるよ。</p>
+    <input id="restoreFile" type="file" accept=".json,application/json">
+  </div>
+
+  <div class="card">
+    <h3>CirclePathについて</h3>
+    <p class="muted">CirclePath v0.3</p>
+    <p class="muted">イベント参加をサポートする個人用管理アプリ。</p>
+  </div>
+</section>
+
+</main>
+
+<nav>
+  <button onclick="show('home')" id="nav-home" class="active"><span>⌂</span>ホーム</button>
+  <button onclick="show('map')" id="nav-map"><span>▦</span>マップ</button>
+  <button onclick="show('circles')" id="nav-circles"><span>⌕</span>サークル</button>
+  <button onclick="show('shopping')" id="nav-shopping"><span>▣</span>買い物</button>
+  <button onclick="show('settings')" id="nav-settings"><span>⚙</span>設定</button>
+</nav>
+
+<script>
+const KEY = 'circlepath_v03';
+
+let data = {
+  event:'コミックマーケット',
+  budget:0,
+  circles:[],
+  items:[],
+  map:null
+};
+
+try {
+  const saved = localStorage.getItem(KEY);
+  if(saved) data = {...data,...JSON.parse(saved)};
+} catch(e) {
+  alert('保存データを読み込めませんでした。');
+}
+
+function save(){
+  try{
+    localStorage.setItem(KEY,JSON.stringify(data));
+    render();
+  }catch(e){
+    alert('保存できませんでした。マップ画像のサイズが大きすぎる可能性があります。');
+  }
+}
+
+function show(id){
+  document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  const nav=document.getElementById('nav-'+id);
+  if(nav) nav.classList.add('active');
+
+  render();
+  window.scrollTo(0,0);
+}
+
+function saveEvent(){
+  data.event=document.getElementById('eventName').value.trim() || 'コミックマーケット';
+  save();
+  alert('イベント名を保存したよ！');
+}
+
+function addCircle(){
+  const name=document.getElementById('cname').value.trim();
+  if(!name){alert('サークル名を入力してね');return;}
+
+  data.circles.push({
+    id:Date.now(),
+    name,
+    work:document.getElementById('cwork').value,
+    goods:document.getElementById('cgoods').value,
+    day:document.getElementById('cday').value,
+    space:document.getElementById('cspace').value
+  });
+
+  ['cname','cwork','cgoods','cspace'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cday').value='';
+  save();
+  alert('サークルを登録したよ！');
+}
+
+function deleteCircle(id){
+  if(!confirm('このサークルを削除する？'))return;
+  data.circles=data.circles.filter(c=>c.id!==id);
+  save();
+}
+
+function renderCircles(){
+  const search=(document.getElementById('circleSearch')?.value||'').toLowerCase();
+  const list=document.getElementById('circleList');
+  if(!list)return;
+
+  const filtered=data.circles.filter(c=>
+    [c.name,c.work,c.goods,c.space,c.day].join(' ').toLowerCase().includes(search)
+  );
+
+  list.innerHTML=filtered.map(c=>`
+    <div class="card">
+      <b>${escapeHTML(c.name)}</b>
+      <p class="muted">${escapeHTML(c.work||'')}</p>
+      <p>${escapeHTML(c.day||'')}　${escapeHTML(c.space||'')}</p>
+      <p class="muted">${escapeHTML(c.goods||'')}</p>
+      <button class="danger" onclick="deleteCircle(${Number(c.id)})">削除</button>
+    </div>
+  `).join('') || '<div class="empty">サークルはまだ登録されていません。</div>';
+}
+
+function addItem(){
+  const name=document.getElementById('iname').value.trim();
+  if(!name){alert('商品名を入力してね');return;}
+
+  data.items.push({
+    id:Date.now(),
+    name,
+    circle:document.getElementById('icircle').value,
+    price:Math.max(0,Number(document.getElementById('iprice').value)||0),
+    qty:Math.max(1,Number(document.getElementById('iqty').value)||1),
+    done:false
+  });
+
+  ['iname','icircle','iprice'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('iqty').value=1;
+  save();
+}
+
+function toggleItem(id){
+  const item=data.items.find(i=>i.id===id);
+  if(item)item.done=!item.done;
+  save();
+}
+
+function deleteItem(id){
+  if(!confirm('この商品を削除する？'))return;
+  data.items=data.items.filter(i=>i.id!==id);
+  save();
+}
+
+function saveBudget(){
+  data.budget=Math.max(0,Number(document.getElementById('budget').value)||0);
+  save();
+}
+
+function renderItems(){
+  const list=document.getElementById('itemList');
+  if(!list)return;
+
+  list.innerHTML=data.items.map(i=>`
+    <div class="card">
+      <b>${escapeHTML(i.name)}</b>
+      <p class="muted">${escapeHTML(i.circle||'')}</p>
+      <p>¥${(i.price*i.qty).toLocaleString('ja-JP')}　× ${i.qty}</p>
+      <button onclick="toggleItem(${Number(i.id)})">${i.done?'購入済み ✓':'未購入'}</button>
+      <button class="danger" onclick="deleteItem(${Number(i.id)})">削除</button>
+    </div>
+  `).join('') || '<div class="empty">買い物リストは空だよ。</div>';
+}
+
+function render(){
+  const total=data.items.reduce((sum,i)=>sum+i.price*i.qty,0);
+  const purchased=data.items.filter(i=>i.done).length;
+
+  document.getElementById('eventName').value=data.event||'';
+  document.getElementById('circleCount').textContent=data.circles.length+'件登録';
+  document.getElementById('total').textContent='¥'+total.toLocaleString('ja-JP');
+  document.getElementById('progress').textContent=purchased+'件購入済み';
+  document.getElementById('homeTotal').textContent='¥'+total.toLocaleString('ja-JP');
+  document.getElementById('homeProgress').textContent=purchased+'件購入済み';
+  document.getElementById('budgetText').textContent=
+    '買い物予定 ¥'+total.toLocaleString('ja-JP')+
+    ' ／ 予算 ¥'+Number(data.budget||0).toLocaleString('ja-JP');
+
+  document.getElementById('budget').value=data.budget||'';
+
+  renderCircles();
+  renderItems();
+
+  document.getElementById('routeList').innerHTML=data.circles.map((c,index)=>`
+    <div class="item">
+      <b>${index+1}. ${escapeHTML(c.name)}</b>
+      <p class="muted">${escapeHTML(c.day||'')}　${escapeHTML(c.space||'')}</p>
+    </div>
+  `).join('') || '<div class="empty">先にサークルを登録してね。</div>';
+
+  const preview=document.getElementById('mapPreview');
+  const message=document.getElementById('mapMessage');
+
+  if(data.map){
+    preview.src=data.map;
+    preview.classList.remove('hidden');
+    message.classList.add('hidden');
+  }else{
+    preview.removeAttribute('src');
+    preview.classList.add('hidden');
+    message.classList.remove('hidden');
+  }
+}
+
+function escapeHTML(value){
+  return String(value??'').replace(/[&<>"']/g,char=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  })[char]);
+}
+
+// マップ画像の読み込み
+document.getElementById('mapFile').addEventListener('change',e=>{
+  const file=e.target.files?.[0];
+  if(!file)return;
+
+  if(!file.type.startsWith('image/')){
+    alert('画像ファイルを選択してね。');
+    return;
+  }
+
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=1600;
+      const scale=Math.min(1,max/Math.max(img.width,img.height));
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.round(img.width*scale);
+      canvas.height=Math.round(img.height*scale);
+
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+
+      data.map=canvas.toDataURL('image/jpeg',0.78);
+      save();
+      alert('会場マップを保存したよ！');
+    };
+    img.onerror=()=>alert('画像を読み込めませんでした。');
+    img.src=reader.result;
+  };
+  reader.onerror=()=>alert('ファイルを読み込めませんでした。');
+  reader.readAsDataURL(file);
+  e.target.value='';
+});
+
+function deleteMap(){
+  if(!confirm('会場マップを削除する？'))return;
+  data.map=null;
+  save();
+}
+
+function backup(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='circlepath-backup.json';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+// バックアップ復元（以前の形式にも対応）
+document.getElementById('restoreFile').addEventListener('change',async e=>{
+  const file=e.target.files?.[0];
+  if(!file)return;
+
+  try{
+    const restored=JSON.parse(await file.text());
+
+    if(!restored||!Array.isArray(restored.circles)||!Array.isArray(restored.items)){
+      throw new Error('Invalid backup');
+    }
+
+    if(!confirm('現在のデータをバックアップの内容に置き換える？'))return;
+
+    data={
+      event:restored.event||'コミックマーケット',
+      budget:Number(restored.budget)||0,
+      circles:restored.circles.map(c=>({
+        ...c,
+        id:c.id||Date.now()+Math.random(),
+        name:c.name||'名称未設定',
+        goods:c.goods||c.character||''
+      })),
+      items:restored.items.map(i=>({
+        ...i,
+        id:i.id||Date.now()+Math.random(),
+        name:i.name||'名称未設定',
+        price:Number(i.price)||0,
+        qty:Number(i.qty)||1,
+        done:!!i.done
+      })),
+      map:restored.map||null
+    };
+
+    save();
+    alert('バックアップを読み込んだよ！');
+  }catch(err){
+    alert('バックアップを読み込めませんでした。ファイルを確認してね。');
+  }finally{
+    e.target.value='';
+  }
+});
+
+render();
+</script>
+</body>
+</html>
