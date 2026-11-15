@@ -42,11 +42,8 @@ export default async function handler(req, res) {
     'twitter.com'
   ]
 })
-    
-  ]
-})
-      }
-    );
+    }
+  );
 
     if (!response.ok) {
       throw new Error('検索サービスでエラーが発生しました。');
