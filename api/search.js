@@ -79,6 +79,16 @@ const results = unique
   .map(item => {
     const text = `${item.title || ''} ${item.content || ''}`;
     const lower = text.toLowerCase();
+    const normalizedText = lower.replace(/[\s　]/g, '');
+const queryWords = query.toLowerCase()
+  .split(/[\s　]+/)
+  .filter(Boolean);
+
+if (!queryWords.every(word =>
+  normalizedText.includes(word.replace(/[\s　]/g, ''))
+)) {
+  return null;
+}
 
     const excluded = [
       'コミックマーケット準備会',
