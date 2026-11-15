@@ -134,14 +134,14 @@ const results = unique
     );
 
     return {
-      title: item.title || 'タイトルなし',
-      url,
-      content: item.content || '',
-      status: 'Webで発見・未確認',
-      score,
-      author: xMatch ? xMatch[1].toLowerCase() : null
-    };
-  })
+  title: item.title || 'タイトルなし',
+  url,
+  content: item.content || '',
+  status: 'Webで発見・未確認',
+  score,
+  author: xMatch ? xMatch[1].toLowerCase() : null,
+  publishedDate: item.published_date || null
+};
   .filter(Boolean)
   .sort((a, b) => b.score - a.score);
 
