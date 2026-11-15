@@ -305,6 +305,12 @@ nav button.active{color:#c5a8ff}
 
   <input id="circleSearch" placeholder="サークル名・作品名・配置で検索" oninput="renderCircles()">
   <div id="circleList"></div>
+  <div class="card">
+  <h3>🔎 Web・AI検索</h3>
+  <input id="externalSearch" placeholder="作品名・キャラ名・サークル名">
+  <button class="full" onclick="searchExternal()">Web・AI検索</button>
+  <div id="externalSearchResults"></div>
+</div>
 </section>
 
 <!-- 買い物 -->
@@ -507,7 +513,18 @@ function renderCircles(){
     </div>
   `).join('') || '<div class="empty">サークルはまだ登録されていません。</div>';
 }
+async function searchExternal(){
+  const input = document.getElementById('externalSearch');
+  const results = document.getElementById('externalSearchResults');
+  const query = input.value.trim();
 
+  if(!query){
+    results.textContent = '検索ワードを入力してね。';
+    return;
+  }
+
+  results.textContent = '検索機能を準備中です…';
+}
 function addItem(){
   const name=document.getElementById('iname').value.trim();
   if(!name){alert('商品名を入力してね');return;}
