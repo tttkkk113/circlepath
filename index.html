@@ -309,7 +309,27 @@ nav button.active{color:#c5a8ff}
   <h3>🔎 Web・AI検索</h3>
   <input id="externalSearch" placeholder="作品名・キャラ名・サークル名">
   <button class="full" onclick="searchExternal()">Web・AI検索</button>
+  
+
+  <div class="card">
+  <h3>🔎 Web・AI検索</h3>
+  <input id="externalSearch" placeholder="作品名・キャラ名・サークル名">
+  <button class="full" onclick="searchExternal()">Web・AI検索</button>
+
+  <select id="externalSort" onchange="renderExternalResults()">
+    <option value="score">関連度順</option>
+    <option value="date">新着順</option>
+    <option value="name">タイトル順</option>
+  </select>
+
   <div id="externalSearchResults"></div>
+</div>
+ <select id="externalSort" onchange="renderExternalResults()">
+  <option value="score">関連度順</option>
+  <option value="date">新着順</option>
+  <option value="name">タイトル順</option>
+</select>
+<div id="externalSearchResults"></div>
 </div>
 </section>
 
@@ -513,6 +533,42 @@ function renderCircles(){
     </div>
   `).join('') || '<div class="empty">サークルはまだ登録されていません。</div>';
 }
+let externalResultsData = [];
+
+function renderExternalResults(){
+  const results = document.getElementById('externalSearchResults');
+  const sort = document.getElementById('externalSort').value;
+
+  let items = [...externalResultsData];
+
+  if(sort === 'score'){
+    items.sort((a, b) => (b.score || 0) - (a.score || 0));
+  }
+
+  if(sort === 'date'){
+    items.sort((a, b) =>
+      new Date(b.publishedDate || 0) -
+      new Date(a.publishedDate || 0)
+    );
+  }
+
+  if(sort === 'name'){
+    items.sort((a, b) =>
+      a.title.localeCompare(b.title, 'ja')
+    );
+  }
+
+  results.innerHTML = items.map(item => `
+    <div class="card">
+      <b>${escapeHTML(item.title)}</b>
+      <p>${escapeHTML(item.content)}</p>
+      <p class="muted">${escapeHTML(item.status)}</p>
+      <a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer">
+        情報源を開く
+      </a>
+    </div>
+  `).join('');
+}
 async function searchExternal(){
   const input = document.getElementById('externalSearch');
   const results = document.getElementById('externalSearchResults');
@@ -545,17 +601,8 @@ async function searchExternal(){
       return;
     }
 
-    results.innerHTML = data.results.map(item => `
-      <div class="card">
-        <b>${escapeHTML(item.title)}</b>
-        <p>${escapeHTML(item.content)}</p>
-        <p class="muted">${escapeHTML(item.status)}</p>
-        <a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer">
-          情報源を開く
-        </a>
-      </div>
-    `).join('');
-
+    externalResultsData = data.results;
+renderExternalResults();
   } catch(error) {
     results.textContent = error.message;
   }
