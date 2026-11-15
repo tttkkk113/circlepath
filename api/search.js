@@ -32,11 +32,15 @@ export default async function handler(req, res) {
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          query: `${query} コミケ サークル`,
-          search_depth: 'basic',
-          max_results: 8,
-          include_answer: false
-        })
+  query: `${query} C109 コミケWebカタログ サークル名 配置 スペース 頒布物`,
+  search_depth: 'advanced',
+  max_results: 10,
+  include_answer: false,
+  include_domains: [
+    'webcatalog.circle.ms',
+    'x.com'
+  ]
+})
       }
     );
 
