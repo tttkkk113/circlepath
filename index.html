@@ -131,7 +131,27 @@ nav button{
 }
 nav button span{display:block;font-size:20px;margin-bottom:3px}
 nav button.active{color:#c5a8ff}
-#mapPreview{
+#mapPreview{position:relative;
+  width:100%;
+  overflow:hidden;
+  border-radius:12px;
+}
+#mapStage img{
+  display:block;
+  width:100%;
+  height:auto;
+}
+.mapPin{
+  position:absolute;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:#ff4d91;
+  border:3px solid white;
+  transform:translate(-50%,-50%);
+  box-shadow:0 2px 8px #0008;
+}
+
   display:block;
   max-width:100%;
   max-height:65vh;
@@ -282,9 +302,12 @@ nav button.active{color:#c5a8ff}
   </div>
 
   <div class="card">
+  <div id="mapStage">
     <div id="mapMessage" class="empty">マップ画像はまだ登録されていません。</div>
     <img id="mapPreview" class="hidden" alt="会場マップ">
+    <div id="mapPins"></div>
   </div>
+</div>
 </section>
 
 <!-- 巡回 -->
@@ -613,7 +636,57 @@ document.getElementById('restoreFile').addEventListener('change',async e=>{
     e.target.value='';
   }
 });
+const mapStage = document.getElementById('mapStage');
+const mapPins = document.getElementById('mapPins');
 
+function renderMapPins(){
+  mapPins.innerHTML = '';
+  if(!data.map)return;
+
+  (data.pins || []).forEach(pin=>{
+    const el = document.createElement('button');
+    el.className = 'mapPin';
+    el.style.left = pin.x + '%';
+    el.style.top = pin.y + '%';
+    el.textContent = '📍';
+    el.onclick = ()=>{
+      const circle = data.circles.find(c=>c.id === pin.circleId);
+      if(circle) alert(circle.name + '\n' + (circle.space || '') + '\n' + (circle.work || ''));
+    };
+    mapPins.appendChild(el);
+  });
+}
+
+mapStage.addEventListener('click',e=>{
+  if(!data.map || e.target.closest('.mapPin'))return;
+  if(!data.circles.length){
+    alert('先にサークルを登録してね！');
+    return;
+  }
+
+  const circleName = prompt('ピンを付けるサークル名を入力してね');
+  if(!circleName)return;
+
+  const circle = data.circles.find(c=>c.name === circleName);
+  if(!circle){
+    alert('登録済みのサークル名を入力してね。');
+    return;
+  }
+
+  const rect = mapStage.getBoundingClientRect();
+  if(!rect.width || !rect.height)return;
+
+  data.pins = data.pins || [];
+  data.pins.push({
+    circleId: circle.id,
+    x: (e.clientX - rect.left) / rect.width * 100,
+    y: (e.clientY - rect.top) / rect.height * 100
+  });
+  save();
+  renderMapPins();
+});
+
+renderMapPins();
 render();
 </script>
 </body>
