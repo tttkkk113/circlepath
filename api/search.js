@@ -36,8 +36,11 @@ query: `${query} C109 サークル参加 お品書き 新刊 頒布物 スペー
   search_depth: 'advanced',
   max_results: 10,
   include_answer: false,
-  include_domains: [
-    'webcatalog.circle.ms',
+include_domains: [
+  'webcatalog.circle.ms',
+  'x.com',
+  'twitter.com'
+]
     
   ]
 })
