@@ -873,10 +873,21 @@ wrap.addEventListener('touchmove', e => {
 
   if (e.touches.length === 2) {
     const currentDistance = getDistance(e.touches);
-
-    zoom = Math.max(0.5, Math.min(5,
+    const newZoom = Math.max(0.5, Math.min(5,
       startZoom * currentDistance / startDistance
     ));
+
+    const rect = wrap.getBoundingClientRect();
+    const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+    const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+
+    const ratio = newZoom / zoom;
+
+    panX = centerX - (centerX - panX) * ratio;
+    panY = centerY - (centerY - panY) * ratio;
+
+    zoom = newZoom;
+
   } else if (e.touches.length === 1) {
     panX = startPanX + e.touches[0].clientX - startX;
     panY = startPanY + e.touches[0].clientY - startY;
@@ -884,6 +895,7 @@ wrap.addEventListener('touchmove', e => {
 
   canvas.style.transform =
     `translate(${panX}px, ${panY}px) scale(${zoom})`;
+
 }, { passive: false });
 
 
