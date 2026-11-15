@@ -147,6 +147,13 @@ nav button.active{color:#c5a8ff}
   width:100%;
   height:auto;
 }
+#mapPins{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
 .mapPin{
   position:absolute;
   width:14px;
@@ -156,6 +163,7 @@ nav button.active{color:#c5a8ff}
   background:none;
   border:none;
   appearance:none;
+  pointer-events:auto;
   transform:translate(-50%,-50%);
   display:flex;
   align-items:center;
@@ -687,14 +695,23 @@ mapStage.addEventListener('click',e=>{
     return;
   }
 
-  const rect = mapPreview.getBoundingClientRect();
+const rect = mapPreview.getBoundingClientRect();
+
 if(!rect.width || !rect.height)return;
+
+const x = Math.max(0, Math.min(100,
+  (e.clientX - rect.left) / rect.width * 100
+));
+
+const y = Math.max(0, Math.min(100,
+  (e.clientY - rect.top) / rect.height * 100
+));
 
 data.pins = data.pins || [];
 data.pins.push({
   circleId: circle.id,
-  x: (e.clientX - rect.left) / rect.width * 100,
-  y: (e.clientY - rect.top) / rect.height * 100
+  x:x,
+  y:y
 });
 
   data.pins = data.pins || [];
