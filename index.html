@@ -868,46 +868,7 @@ function renderVenuePins() {
   });
 }
 
-pdfMapStage.addEventListener('click', e => {
-  if (e.target.closest('button')) return;
 
-  if (!data.circles.length) {
-    alert('先にサークルを登録してね！');
-    return;
-  }
-
-  const circleName = prompt('ピンを付けるサークル名を入力してね');
-  if (!circleName) return;
-
-  const circle = data.circles.find(c => c.name === circleName);
-
-  if (!circle) {
-    alert('登録済みのサークル名を入力してね。');
-    return;
-  }
-
-  const rect = pdfMapStage.getBoundingClientRect();
-
-  const x = Math.max(0, Math.min(100,
-    (e.clientX - rect.left) / rect.width * 100
-  ));
-
-  const y = Math.max(0, Math.min(100,
-    (e.clientY - rect.top) / rect.height * 100
-  ));
-
-  data.venuePins = data.venuePins || {};
-  data.venuePins[id] = data.venuePins[id] || [];
-
-  data.venuePins[id].push({
-    circleId: circle.id,
-    x: x,
-    y: y
-  });
-
-  save();
-  renderVenuePins();
-});
 
 renderVenuePins();
 wrap.style.touchAction = 'none';
@@ -925,9 +886,14 @@ function getDistance(touches) {
   const dy = touches[0].clientY - touches[1].clientY;
   return Math.sqrt(dx * dx + dy * dy);
 }
+let tapStartX = 0;
+let tapStartY = 0;
+let isPinTap = false;
 
 wrap.addEventListener('touchstart', e => {
   e.preventDefault();
+
+  isPinTap = e.touches.length === 1;
 
   if (e.touches.length === 2) {
     startDistance = getDistance(e.touches);
@@ -937,12 +903,52 @@ wrap.addEventListener('touchstart', e => {
   if (e.touches.length === 1) {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
+    tapStartX = startX;
+    tapStartY = startY;
     startPanX = panX;
     startPanY = panY;
   }
 }, { passive: false });
-
 wrap.addEventListener('touchend', e => {
+  if (e.touches.length === 0 && isPinTap && e.changedTouches.length === 1) {
+    const touch = e.changedTouches[0];
+
+    const rect = pdfMapStage.getBoundingClientRect();
+
+    const x = Math.max(0, Math.min(100,
+      (touch.clientX - rect.left) / rect.width * 100
+    ));
+
+    const y = Math.max(0, Math.min(100,
+      (touch.clientY - rect.top) / rect.height * 100
+    ));
+
+    if (data.circles.length) {
+      const circleName = prompt('ピンを付けるサークル名を入力してね');
+      if (circleName) {
+        const circle = data.circles.find(c => c.name === circleName);
+
+        if (circle) {
+          data.venuePins = data.venuePins || {};
+          data.venuePins[id] = data.venuePins[id] || [];
+          data.venuePins[id].push({
+            circleId: circle.id,
+            x: x,
+            y: y
+          });
+          save();
+          renderVenuePins();
+        } else {
+          alert('登録済みのサークル名を入力してね。');
+        }
+      }
+    } else {
+      alert('先にサークルを登録してね！');
+    }
+  }
+
+  isPinTap = false;
+
   if (e.touches.length === 1) {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
@@ -953,7 +959,10 @@ wrap.addEventListener('touchend', e => {
 
 wrap.addEventListener('touchmove', e => {
   e.preventDefault();
-
+if (Math.abs(e.touches[0].clientX - tapStartX) > 10 ||
+    Math.abs(e.touches[0].clientY - tapStartY) > 10) {
+  isPinTap = false;
+}
   if (e.touches.length === 2) {
     const currentDistance = getDistance(e.touches);
     const newZoom = Math.max(0.5, Math.min(5,
