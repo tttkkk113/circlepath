@@ -673,8 +673,15 @@ mapStage.addEventListener('click',e=>{
     return;
   }
 
-  const rect = mapStage.getBoundingClientRect();
-  if(!rect.width || !rect.height)return;
+  const rect = mapPreview.getBoundingClientRect();
+if(!rect.width || !rect.height)return;
+
+data.pins = data.pins || [];
+data.pins.push({
+  circleId: circle.id,
+  x: (e.clientX - rect.left) / rect.width * 100,
+  y: (e.clientY - rect.top) / rect.height * 100
+});
 
   data.pins = data.pins || [];
   data.pins.push({
