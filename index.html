@@ -876,8 +876,11 @@ pdfMapStage.addEventListener('click', e => {
   });
 
   save();
-  renderVenuePins();
-});
+  const wrap = document.getElementById('pdfCanvasWrap');
+const pdfMapStage = document.getElementById('pdfMapStage');
+const pdfMapPins = document.getElementById('pdfMapPins');
+
+function renderVenuePins() {
   pdfMapPins.innerHTML = '';
 
   const pins = (data.venuePins || {})[id] || [];
@@ -904,6 +907,49 @@ pdfMapStage.addEventListener('click', e => {
     pdfMapPins.appendChild(el);
   });
 }
+
+pdfMapStage.addEventListener('click', e => {
+  if (e.target.closest('button')) return;
+
+  if (!data.circles.length) {
+    alert('先にサークルを登録してね！');
+    return;
+  }
+
+  const circleName = prompt('ピンを付けるサークル名を入力してね');
+  if (!circleName) return;
+
+  const circle = data.circles.find(c => c.name === circleName);
+
+  if (!circle) {
+    alert('登録済みのサークル名を入力してね。');
+    return;
+  }
+
+  const rect = pdfMapStage.getBoundingClientRect();
+
+  const x = Math.max(0, Math.min(100,
+    (e.clientX - rect.left) / rect.width * 100
+  ));
+
+  const y = Math.max(0, Math.min(100,
+    (e.clientY - rect.top) / rect.height * 100
+  ));
+
+  data.venuePins = data.venuePins || {};
+  data.venuePins[id] = data.venuePins[id] || [];
+
+  data.venuePins[id].push({
+    circleId: circle.id,
+    x: x,
+    y: y
+  });
+
+  save();
+  renderVenuePins();
+});
+
+renderVenuePins();
 wrap.style.touchAction = 'none';
 pdfMapStage.style.transformOrigin = '0 0';
 
@@ -994,11 +1040,7 @@ function closeVenueMap(){
 
 
 
-function closeVenueMap(){
-  document.getElementById('venueMapViewer').classList.add('hidden');
-  document.getElementById('venueMapContent').innerHTML = '';
-  document.querySelector('.mapGrid').classList.remove('hidden');
-}
+
 
 render();
 </script>
