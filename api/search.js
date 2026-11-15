@@ -34,7 +34,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
   query: `"${query}" C109 参加サークル お品書き 新刊 頒布物 サークル名 スペース番号 -申込書 -チケット -通販 -入場案内`,
   search_depth: 'advanced',
-  max_results: 10,
+  max_results: 30,
   include_answer: false,
   include_domains: [
     'webcatalog.circle.ms',
