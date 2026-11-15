@@ -812,18 +812,7 @@ function closeVenueMap(){
 }
 
 
-function openVenueMap(id){
-  const map = venueMaps[id];
-  if(!map)return;
 
-  document.getElementById('venueMapViewer').classList.remove('hidden');
-  document.getElementById('venueMapContent').innerHTML = `
-    <h3>${map.name}</h3>
-    <iframe src="${map.file}"></iframe>
-  `;
-
-  document.querySelector('.mapGrid').classList.add('hidden');
-}
 
 function closeVenueMap(){
   document.getElementById('venueMapViewer').classList.add('hidden');
