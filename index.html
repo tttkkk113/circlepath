@@ -872,6 +872,24 @@ wrap.addEventListener('touchmove', e => {
   e.preventDefault();
 
   if (e.touches.length === 2) {
+    const currentDistance = getDistance(e.touches);
+
+    zoom = Math.max(0.5, Math.min(5,
+      startZoom * currentDistance / startDistance
+    ));
+  } else if (e.touches.length === 1) {
+    panX = startPanX + e.touches[0].clientX - startX;
+    panY = startPanY + e.touches[0].clientY - startY;
+  }
+
+  canvas.style.transform =
+    `translate(${panX}px, ${panY}px) scale(${zoom})`;
+}, { passive: false });
+
+wrap.addEventListener('touchmove', e => {
+  e.preventDefault();
+
+  if (e.touches.length === 2) {
   const currentDistance = getDistance(e.touches);
 
   zoom = Math.max(0.5, Math.min(5,
