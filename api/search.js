@@ -84,7 +84,7 @@ const queryWords = query.toLowerCase()
   .split(/[\s　]+/)
   .filter(Boolean);
 
-if (!queryWords.every(word =>
+if (!queryWords.some(word =>
   normalizedText.includes(word.replace(/[\s　]/g, ''))
 )) {
   return null;
