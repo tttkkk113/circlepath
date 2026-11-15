@@ -32,7 +32,7 @@ export default async function handler(req, res) {
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-  query: `${query} C109 コミケWebカタログ サークル名 配置 スペース 頒布物`,
+query: `${query} C109 サークル参加 お品書き 新刊 頒布物 スペース 配置`,
   search_depth: 'advanced',
   max_results: 10,
   include_answer: false,
