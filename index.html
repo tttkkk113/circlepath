@@ -800,7 +800,7 @@ function openVenueMap(id) {
 
   document.getElementById('venueMapContent').innerHTML = `
   <h3>${map.name}</h3>
-  <a href="${map.file}" target="_blank"
+<a href="https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(map.file)}" target="_blank"
      style="display:block;padding:16px;background:#352b55;color:white;border-radius:10px;text-align:center;">
     PDFマップを開く
   </a>
