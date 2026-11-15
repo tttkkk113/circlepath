@@ -68,6 +68,12 @@ console.log('検索APIの結果:', data);
   '開催日程',
   'December 29-31',
   '入場時間'
+  'リポスト',
+'Repost',
+'RT @',
+'引用ポスト',
+'引用リポスト',
+'Retweeted'
 ];
 
     return !excluded.some(word => text.includes(word));
