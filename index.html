@@ -769,7 +769,8 @@ data.pins.push({
 
 renderMapPins();
 
-function openVenueMap(id) {
+
+async function openVenueMap(id) {
   const venueMaps = {
     east123: {
       name: '東1・2・3',
@@ -790,23 +791,51 @@ function openVenueMap(id) {
   };
 
   const map = venueMaps[id];
-
-  if (!map) {
-    alert('マップが見つかりません');
-    return;
-  }
+  if (!map) return;
 
   document.getElementById('venueMapViewer').classList.remove('hidden');
-
-  document.getElementById('venueMapContent').innerHTML = `
-  <h3>${map.name}</h3>
-<a href="https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(map.file)}" target="_blank"
-     style="display:block;padding:16px;background:#352b55;color:white;border-radius:10px;text-align:center;">
-    PDFマップを開く
-  </a>
-`;
   document.querySelector('.mapGrid').classList.add('hidden');
+
+  const content = document.getElementById('venueMapContent');
+
+  content.innerHTML = `
+    <h3>${map.name}</h3>
+    <div id="pdfCanvasWrap" style="width:100%;overflow:auto;background:#222;">
+      <canvas id="pdfCanvas"></canvas>
+    </div>
+    <p id="pdfStatus">マップを読み込み中...</p>
+  `;
+
+  try {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const pdf = await pdfjsLib.getDocument(map.file).promise;
+    const page = await pdf.getPage(1);
+
+    const canvas = document.getElementById('pdfCanvas');
+    const context = canvas.getContext('2d');
+
+    const viewport = page.getViewport({ scale: 1.5 });
+
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    canvas.style.width = '100%';
+    canvas.style.height = 'auto';
+
+    await page.render({
+      canvasContext: context,
+      viewport: viewport
+    }).promise;
+
+    document.getElementById('pdfStatus').remove();
+
+  } catch (error) {
+    document.getElementById('pdfStatus').textContent =
+      'マップを読み込めませんでした。通信環境を確認してね。';
+  }
 }
+
 
 
 function closeVenueMap(){
@@ -826,5 +855,6 @@ function closeVenueMap(){
 
 render();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </body>
 </html>
