@@ -523,7 +523,42 @@ async function searchExternal(){
     return;
   }
 
-  results.textContent = '検索機能を準備中です…';
+  results.textContent = '検索中…';
+
+  try {
+    const response = await fetch('/api/search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ query })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+      throw new Error(data.error || '検索に失敗しました。');
+    }
+
+    if(!data.results || data.results.length === 0){
+      results.textContent = '検索結果が見つかりませんでした。';
+      return;
+    }
+
+    results.innerHTML = data.results.map(item => `
+      <div class="card">
+        <b>${escapeHTML(item.title)}</b>
+        <p>${escapeHTML(item.content)}</p>
+        <p class="muted">${escapeHTML(item.status)}</p>
+        <a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer">
+          情報源を開く
+        </a>
+      </div>
+    `).join('');
+
+  } catch(error) {
+    results.textContent = error.message;
+  }
 }
 function addItem(){
   const name=document.getElementById('iname').value.trim();
