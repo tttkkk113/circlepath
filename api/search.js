@@ -100,7 +100,7 @@ const results = unique
       'retweeted'
     ];
 
-    if (excluded.some(word => lower.includes(word.toLowerCase()))) {
+    if (excluded.some(word => lower.includes(word))) {
       return null;
     }
 
@@ -119,25 +119,44 @@ const results = unique
     ];
 
     const score = keywords.reduce(
-      (total, word) => total + (lower.includes(word.toLowerCase()) ? 1 : 0),
+      (total, word) => total + (lower.includes(word) ? 1 : 0),
       0
     );
 
     if (score < 2) return null;
 
+    const url = item.url || '';
+
+    const xMatch = url.match(
+      /(?:x\.com|twitter\.com)\/([^/?#]+)\/status\/\d+/i
+    );
+
     return {
       title: item.title || 'タイトルなし',
-      url: item.url || '',
+      url,
       content: item.content || '',
       status: 'Webで発見・未確認',
-      score
+      score,
+      author: xMatch ? xMatch[1].toLowerCase() : null
     };
   })
   .filter(Boolean)
-  .sort((a, b) => b.score - a.score)
-  .map(({ score, ...item }) => item);
+  .sort((a, b) => b.score - a.score);
 
-return res.status(200).json({ results });
+const usedAuthors = new Set();
+
+const limitedResults = results.filter(item => {
+  if (!item.author) return true;
+
+  if (usedAuthors.has(item.author)) return false;
+
+  usedAuthors.add(item.author);
+  return true;
+});
+
+const finalResults = limitedResults.map(({ score, author, ...item }) => item);
+
+return res.status(200).json({ results: finalResults });
   } catch (error) {
     return res.status(500).json({
   error: error.message || '検索に失敗しました。'
