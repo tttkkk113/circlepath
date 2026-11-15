@@ -798,9 +798,13 @@ function openVenueMap(id) {
 
   document.getElementById('venueMapViewer').classList.remove('hidden');
 
-  document.getElementById('venueMapContent').innerHTML =
-    `<h3>${map.name}</h3><iframe src="${map.file}"></iframe>`;
-
+  document.getElementById('venueMapContent').innerHTML = `
+  <h3>${map.name}</h3>
+  <a href="${map.file}" target="_blank"
+     style="display:block;padding:16px;background:#352b55;color:white;border-radius:10px;text-align:center;">
+    PDFマップを開く
+  </a>
+`;
   document.querySelector('.mapGrid').classList.add('hidden');
 }
 
