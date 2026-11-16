@@ -470,11 +470,7 @@ function show(id){
   const nav=document.getElementById('nav-'+id);
   if(nav) nav.classList.add('active');
 
-  try {
   render();
-} catch(error) {
-  alert('画面更新エラー：' + error.message);
-}
   window.scrollTo(0,0);
 }
 
