@@ -525,7 +525,31 @@ function renderCircles(){
   `).join('') || '<div class="empty">サークルはまだ登録されていません。</div>';
 }
 let externalResultsData = [];
+function fillCircleFromSearch(index){
+  const item = externalResultsData[index];
+  if(!item) return;
 
+  const text = `${item.title || ''} ${item.rawContent || ''}`;
+
+  const circle = text.match(
+    /(?:貴方|あなた)のサークル「([^」]+)」/
+  );
+
+  const space = text.match(
+    /((?:東|西|南)\s*[0-9０-９]+(?:ホール)?\s*[A-ZＡ-Ｚ]\s*[0-9０-９]+[a-zａ-ｚA-ZＡ-Ｚ]*)\s*に配置/
+  );
+
+  const day = text.match(/([1-4])日目/);
+
+  if(circle) document.getElementById('cname').value = circle[1];
+  if(space) document.getElementById('cspace').value = space[1];
+  if(day) document.getElementById('cday').value = day[1] + '日目';
+
+  document.getElementById('cname').scrollIntoView({
+    behavior: 'smooth',
+    block: 'center'
+  });
+}
 function renderExternalResults(){
   const results = document.getElementById('externalSearchResults');
   const sort = document.getElementById('externalSort').value;
@@ -550,15 +574,18 @@ function renderExternalResults(){
   }
 
   results.innerHTML = items.map(item => `
-    <div class="card">
-      <b>${escapeHTML(item.title)}</b>
-      <p>${escapeHTML(item.content)}</p>
-      <p class="muted">${escapeHTML(item.status)}</p>
-      <a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer">
-        情報源を開く
-      </a>
-    </div>
-  `).join('');
+  <div class="card">
+    <b>${escapeHTML(item.title)}</b>
+    <p>${escapeHTML(item.content)}</p>
+    <p class="muted">${escapeHTML(item.status)}</p>
+    <a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer">
+      情報源を開く
+    </a>
+    <button type="button" onclick="fillCircleFromSearch(${externalResultsData.indexOf(item)})">
+      ＋ サークル登録
+    </button>
+  </div>
+`).join('');
 }
 async function searchExternal(){
   const input = document.getElementById('externalSearch');
