@@ -145,11 +145,11 @@ if (!queryWords.some(word =>
     const xMatch = url.match(
       /(?:x\.com|twitter\.com)\/([^/?#]+)\/status\/\d+/i
     );
-
+const isX = /(?:x\.com|twitter\.com)\//i.test(url);
     return {
   title: item.title || 'タイトルなし',
   url,
-  content: item.content || '',
+content: isX ? '' : (item.content || ''),
   status: 'Webで発見・未確認',
   score,
   author: xMatch ? xMatch[1].toLowerCase() : null,
