@@ -551,6 +551,42 @@ if(placementMatch){
     block: 'center'
   });
 }
+function fillCircleFromSearch(index){
+  const item = externalResultsData[index];
+  if(!item) return;
+
+  const text = `${item.title || ''} ${item.rawContent || ''}`;
+
+  const circle = text.match(
+    /(?:貴サークル|貴方のサークル|あなたのサークル)[「『「]([^」』」]+)[」』」]/
+  );
+
+  const placementMatch = text.match(
+    /は、?\s*(.{1,60}?)\s*に配置されました/
+  );
+
+  let space = '';
+
+  if(placementMatch){
+    space = placementMatch[1]
+      .replace(/^(?:月|火|水|木|金|土|日)曜日?\s*/, '')
+      .replace(/^(?:東|西|南|北)地区\s*/, '')
+      .normalize('NFKC')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  const day = text.match(/([1-4])日目/);
+
+  if(circle) document.getElementById('cname').value = circle[1];
+  if(space) document.getElementById('cspace').value = space;
+  if(day) document.getElementById('cday').value = day[1] + '日目';
+
+  document.getElementById('cname').scrollIntoView({
+    behavior: 'smooth',
+    block: 'center'
+  });
+}
 function renderExternalResults(){
   const results = document.getElementById('externalSearchResults');
   const sort = document.getElementById('externalSort').value;
