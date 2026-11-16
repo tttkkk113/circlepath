@@ -150,6 +150,7 @@ const isX = /(?:x\.com|twitter\.com)\//i.test(url);
   title: item.title || 'タイトルなし',
   url,
 content: isX ? '' : (item.content || ''),
+rawContent: isX ? (item.content || '') : '',
   status: 'Webで発見・未確認',
   score,
   author: xMatch ? xMatch[1].toLowerCase() : null,
